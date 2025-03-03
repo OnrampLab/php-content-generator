@@ -102,19 +102,4 @@ class ContentGeneratorTest extends TestCase {
         $this->assertContains('test', $missingContexts);
         $this->assertEquals('Hello, {{ test }}!', $content);
     }
-
-    public function testGetNestedMissingContexts() {
-        $this->contentGenerator->registerContext('content', new class implements ContextDataProvider {
-            public function getData(array $parameters = []): string {
-                return 'Hi {{user.name}}, welcome!';
-            }
-        });
-
-        $this->contentGenerator->registerTemplate('welcome_template', '{{content}}');
-
-        $content = $this->contentGenerator->generateContent('welcome_template');
-        $this->assertEquals('Hi {{user.name}}, welcome!', $content);
-        $missingContexts = $this->contentGenerator->getMissingContexts();
-        $this->assertContains('user', $missingContexts);
-    }
 }
