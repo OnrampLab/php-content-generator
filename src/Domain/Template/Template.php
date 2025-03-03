@@ -31,10 +31,13 @@ class Template {
 
             $contextData = [];
             foreach ($contexts as $key => $context) {
-                $contextData[$key] = $context->render($parameters);
+                $rendered = $context->render($parameters);
+                if (is_string($rendered)) {
+                    $rendered = $mustache->render($rendered, $contextData);
+                }
+                $contextData[$key] = $rendered;
             }
 
-            // Add default placeholders for missing context variables
             $allVariables = TemplateParser::extractVariables($this->templateContent);
 
             foreach ($allVariables as $variable) {

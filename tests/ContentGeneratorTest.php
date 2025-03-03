@@ -33,6 +33,25 @@ class ContentGeneratorTest extends TestCase {
         $this->assertEquals('Hello, Alice, your role is {{ user.role }}.', $content);
     }
 
+    public function testNestedContextVariables() {
+        $this->contentGenerator->registerContext('user', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): array {
+                return ['name' => 'Alice'];
+            }
+        });
+
+        $this->contentGenerator->registerContext('content', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string {
+                return 'Hi {{user.name}}, welcome!';
+            }
+        });
+
+        $this->contentGenerator->registerTemplate('welcome_template', '{{content}}');
+
+        $content = $this->contentGenerator->generateContent('welcome_template');
+        $this->assertEquals('Hi Alice, welcome!', $content);
+    }
+
     public function testComplexTemplateStructure() {
         $this->contentGenerator->registerContext('user', new class implements ContextDataProvider {
             public function getData(array $parameters = []): array {
