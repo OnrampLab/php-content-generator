@@ -7,7 +7,7 @@ ContentGenerator is a PHP package designed to manage and generate content using 
 To install the package, use Composer:
 
 ```bash
-composer require your-namespace/content-generator
+composer require onramplab/php-content-generator
 ```
 
 ## Usage
