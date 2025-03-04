@@ -8,6 +8,7 @@ use ContentGenerator\Domain\Context\DefaultContextDataProvider;
 
 class ContextManager implements ContextRepositoryInterface {
     private array $contexts = [];
+    private array $missingContexts = [];
 
     public function addContext(Context $context): void {
         $this->contexts[$context->getName()] = $context;
@@ -21,7 +22,11 @@ class ContextManager implements ContextRepositoryInterface {
         return $this->contexts;
     }
 
+    public function addMissingContext(string $contextName): void {
+        $this->missingContexts[] = $contextName;
+    }
+
     public function getMissingContexts(): array {
-        return array_keys(array_filter($this->contexts, fn($context) => $context->isDefault()));
+        return $this->missingContexts;
     }
 }
