@@ -34,4 +34,14 @@ class ContextManager implements ContextRepositoryInterface
     {
         return $this->missingContexts;
     }
+
+    public function removeContext(string $contextName): void
+    {
+        unset($this->contexts[$contextName]);
+    }
+
+    public function removeMissingContext(string $contextName): void
+    {
+        $this->missingContexts = array_filter($this->missingContexts, fn($context) => $context !== $contextName);
+    }
 }
