@@ -2,30 +2,36 @@
 
 namespace ContentGenerator\Domain\Context;
 
-class Context {
+class Context
+{
     protected string $contextName;
     private ContextDataProvider $contextData;
+    private mixed $renderData;
 
-    public function __construct(string $contextName, ContextDataProvider $contextData) {
+    public function __construct(string $contextName, ContextDataProvider $contextData)
+    {
         $this->contextName = $contextName;
         $this->contextData = $contextData;
+        $this->renderData = null;
     }
 
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->contextName;
     }
 
-    public function render(array $parameters = []): mixed {
-        $data = $this->contextData->getData($parameters);
-
-        if (is_array($data)) {
-            return array_map(fn($value) => is_string($value) ? $value : json_encode($value), $data);
+    public function render(array $parameters = []): mixed
+    {
+        if ($this->renderData !== null) {
+            return $this->renderData;
         }
-        return $data;
-    }
 
+        $this->renderData = $this->contextData->getData($parameters);
 
-    public function isDefault(): bool {
-        return $this->contextData instanceof DefaultContextDataProvider;
+        if (is_array($this->renderData)) {
+            $this->renderData = array_map(fn($value) => is_string($value) ? $value : json_encode($value), $this->renderData);
+        }
+
+        return $this->renderData;
     }
 }
