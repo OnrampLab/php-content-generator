@@ -2,6 +2,7 @@
 
 namespace ContentGenerator\Tests;
 
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use ContentGenerator\Application\ContextManager;
 use ContentGenerator\Application\TemplateManager;
@@ -158,5 +159,27 @@ class ContentGeneratorTest extends TestCase
 
         $content = $this->contentGenerator->generateContent('complex');
         $this->assertEquals('Hi Alice, welcome!, Role: admin', $content);
+    }
+
+    public function testDetectRecursiveContext()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Detected recursive context: content');
+
+        $this->contentGenerator->registerContext('content', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string
+            {
+                return 'Hi {{user}}, welcome!';
+            }
+        });
+
+        $this->contentGenerator->registerContext('user', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string
+            {
+                return '{{content}}';
+            }
+        });
+
+        $this->contentGenerator->registerTemplate('recursive_template', '{{content}}');
     }
 }

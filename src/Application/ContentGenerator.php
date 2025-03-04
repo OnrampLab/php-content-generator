@@ -23,6 +23,7 @@ class ContentGenerator
     public function registerContext(string $contextName, ContextDataProvider $provider): void
     {
         $this->contextRepository->addContext(new Context($contextName, $provider));
+        $this->contextRepository->removeMissingContext($contextName);
     }
 
     public function registerTemplate(string $templateName, string $templateContent): void
@@ -30,24 +31,38 @@ class ContentGenerator
         $template = new Template($templateName, $templateContent);
         $this->templateRepository->addTemplate($template);
 
-        $this->checkAndRegisterContexts($templateContent);
+        $this->checkAndRegisterNestedContexts($templateContent);
     }
 
-    private function checkAndRegisterContexts(string $templateContent): void
+    public function checkAndRegisterNestedContexts(string $templateContent, array &$visited = []): void
     {
         $variables = TemplateParser::extractVariables($templateContent);
 
         foreach ($variables as $var) {
+            if (in_array($var, $visited)) {
+                throw new \RuntimeException("Detected recursive context: $var");
+            }
+
             if (is_null($this->contextRepository->getContext($var))) {
                 $this->contextRepository->addMissingContext($var);
                 continue;
             }
+
+            $visited[] = $var;
+
             // Check nested templates
             $nestedTemplate = $this->contextRepository->getContext($var)->render();
-            if (is_string($nestedTemplate)) {
-                $this->checkAndRegisterContexts($nestedTemplate);
+            if (is_string($nestedTemplate) && $this->containsTemplateVariables($nestedTemplate)) {
+                $this->checkAndRegisterNestedContexts($nestedTemplate, $visited);
             }
+
+            array_pop($visited); // Remove the current variable from the visited list after checking nested contexts
         }
+    }
+
+    private function containsTemplateVariables(string $template): bool
+    {
+        return preg_match('/{{.*}}/', $template) === 1;
     }
 
     public function generateContent(string $templateName, array $parameters = []): string
@@ -67,5 +82,10 @@ class ContentGenerator
     public function getMissingContexts(): array
     {
         return $this->contextRepository->getMissingContexts();
+    }
+
+    public function removeContext(string $contextName): void
+    {
+        $this->contextRepository->removeContext($contextName);
     }
 }
