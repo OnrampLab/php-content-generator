@@ -2,22 +2,26 @@
 
 namespace ContentGenerator\Domain\Context;
 
-class Context {
+class Context
+{
     protected string $contextName;
     private ContextDataProvider $contextData;
     private mixed $renderData;
 
-    public function __construct(string $contextName, ContextDataProvider $contextData) {
+    public function __construct(string $contextName, ContextDataProvider $contextData)
+    {
         $this->contextName = $contextName;
         $this->contextData = $contextData;
         $this->renderData = null;
     }
 
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->contextName;
     }
 
-    public function render(array $parameters = []): mixed {
+    public function render(array $parameters = []): mixed
+    {
         if ($this->renderData !== null) {
             return $this->renderData;
         }

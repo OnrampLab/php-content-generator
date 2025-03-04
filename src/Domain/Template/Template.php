@@ -5,24 +5,29 @@ namespace ContentGenerator\Domain\Template;
 use Mustache_Engine;
 use Mustache_Loader_StringLoader;
 
-class Template {
+class Template
+{
     private string $templateName;
     private string $templateContent;
 
-    public function __construct(string $templateName, string $templateContent) {
+    public function __construct(string $templateName, string $templateContent)
+    {
         $this->templateName = $templateName;
         $this->templateContent = $templateContent;
     }
 
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->templateName;
     }
 
-    public function getContent(): string {
+    public function getContent(): string
+    {
         return $this->templateContent;
     }
 
-    public function render(array $contexts, array $parameters = []): string {
+    public function render(array $contexts, array $parameters = []): string
+    {
         try {
             $mustache = new Mustache_Engine([
                 'loader' => new Mustache_Loader_StringLoader(),

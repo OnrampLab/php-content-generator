@@ -9,27 +9,32 @@ use ContentGenerator\Domain\Template\TemplateParser;
 use ContentGenerator\Domain\Context\Context;
 use ContentGenerator\Domain\Template\Template;
 
-class ContentGenerator {
+class ContentGenerator
+{
     private ContextRepositoryInterface $contextRepository;
     private TemplateRepositoryInterface $templateRepository;
 
-    public function __construct(ContextRepositoryInterface $contextRepository, TemplateRepositoryInterface $templateRepository) {
+    public function __construct(ContextRepositoryInterface $contextRepository, TemplateRepositoryInterface $templateRepository)
+    {
         $this->contextRepository = $contextRepository;
         $this->templateRepository = $templateRepository;
     }
 
-    public function registerContext(string $contextName, ContextDataProvider $provider): void {
+    public function registerContext(string $contextName, ContextDataProvider $provider): void
+    {
         $this->contextRepository->addContext(new Context($contextName, $provider));
     }
 
-    public function registerTemplate(string $templateName, string $templateContent): void {
+    public function registerTemplate(string $templateName, string $templateContent): void
+    {
         $template = new Template($templateName, $templateContent);
         $this->templateRepository->addTemplate($template);
 
         $this->checkAndRegisterContexts($templateContent);
     }
 
-    private function checkAndRegisterContexts(string $templateContent): void {
+    private function checkAndRegisterContexts(string $templateContent): void
+    {
         $variables = TemplateParser::extractVariables($templateContent);
 
         foreach ($variables as $var) {
@@ -45,7 +50,8 @@ class ContentGenerator {
         }
     }
 
-    public function generateContent(string $templateName, array $parameters = []): string {
+    public function generateContent(string $templateName, array $parameters = []): string
+    {
         $template = $this->templateRepository->getTemplate($templateName);
         if (!$template) {
             throw new \RuntimeException("Template '$templateName' not found.");
@@ -58,7 +64,8 @@ class ContentGenerator {
     }
 
 
-    public function getMissingContexts(): array {
+    public function getMissingContexts(): array
+    {
         return $this->contextRepository->getMissingContexts();
     }
 }

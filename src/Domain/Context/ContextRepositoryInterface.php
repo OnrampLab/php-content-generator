@@ -2,7 +2,8 @@
 
 namespace ContentGenerator\Domain\Context;
 
-interface ContextRepositoryInterface {
+interface ContextRepositoryInterface
+{
     public function addContext(Context $context): void;
     public function getContext(string $contextName): ?Context;
     public function getAllContexts(): array;

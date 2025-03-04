@@ -5,14 +5,17 @@ namespace ContentGenerator\Application;
 use ContentGenerator\Domain\Template\Template;
 use ContentGenerator\Domain\Template\TemplateRepositoryInterface;
 
-class TemplateManager implements TemplateRepositoryInterface {
+class TemplateManager implements TemplateRepositoryInterface
+{
     private array $templates = [];
 
-    public function addTemplate(Template $template): void {
+    public function addTemplate(Template $template): void
+    {
         $this->templates[$template->getName()] = $template;
     }
 
-    public function getTemplate(string $templateName): ?Template {
+    public function getTemplate(string $templateName): ?Template
+    {
         return $this->templates[$templateName] ?? null;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace ContentGenerator\Domain\Context;
 
-interface ContextDataProvider {
+interface ContextDataProvider
+{
     public function getData(array $parameters = []): mixed;
 }
