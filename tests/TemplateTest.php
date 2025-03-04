@@ -16,6 +16,6 @@ class TemplateTest extends TestCase {
     public function testRenderTemplate() {
         $template = new Template('testTemplate', 'Hello, {{ name }}!');
         $context = new Context('name', new DefaultContextDataProvider('name'));
-        $this->assertEquals('Hello, {{ name }}!', $template->render(['name' => $context]));
+        $this->assertEquals('Hello, name!', $template->render(['name' => $context]));
     }
 }

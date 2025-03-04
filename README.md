@@ -35,7 +35,7 @@ $contentGenerator->registerTemplate('greeting', 'Hello, {{ name }}!');
 
 // Generate content
 $content = $contentGenerator->generateContent('greeting');
-echo $content; // Outputs: Hello, {{ name }}!
+echo $content; // Outputs: Hello, name!
 ```
 
 ## Testing
