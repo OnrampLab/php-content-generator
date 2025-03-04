@@ -7,8 +7,6 @@ use ContentGenerator\Application\ContextManager;
 use ContentGenerator\Application\TemplateManager;
 use ContentGenerator\Application\ContentGenerator;
 use ContentGenerator\Domain\Context\ContextDataProvider;
-use ContentGenerator\Domain\Template\Template;
-use ContentGenerator\Domain\Context\Context;
 
 class ContentGeneratorTest extends TestCase {
     private ContentGenerator $contentGenerator;
@@ -32,7 +30,7 @@ class ContentGeneratorTest extends TestCase {
         $this->assertContains('user.role', $missingContexts);
 
         $content = $this->contentGenerator->generateContent('nested_missing');
-        $this->assertEquals('Hello, Alice, your role is {{ user.role }}.', $content);
+        $this->assertEquals('Hello, Alice, your role is .', $content);
     }
 
     public function testNestedContextVariables() {
@@ -100,6 +98,21 @@ class ContentGeneratorTest extends TestCase {
         $missingContexts = $this->contentGenerator->getMissingContexts();
         $content = $this->contentGenerator->generateContent('greeting');
         $this->assertContains('test', $missingContexts);
-        $this->assertEquals('Hello, {{ test }}!', $content);
+        $this->assertEquals('Hello, !', $content);
+    }
+
+    public function testGetNestedMissingContexts() {
+        $this->contentGenerator->registerContext('content', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string {
+                return 'Hi {{user.name}}, welcome!';
+            }
+        });
+
+        $this->contentGenerator->registerTemplate('welcome_template', '{{content}}');
+
+        $content = $this->contentGenerator->generateContent('welcome_template');
+        $this->assertEquals('Hi , welcome!', $content);
+        $missingContexts = $this->contentGenerator->getMissingContexts();
+        $this->assertContains('user.name', $missingContexts);
     }
 }

@@ -8,7 +8,6 @@ use ContentGenerator\Domain\Template\TemplateRepositoryInterface;
 use ContentGenerator\Domain\Template\TemplateParser;
 use ContentGenerator\Domain\Context\Context;
 use ContentGenerator\Domain\Template\Template;
-use ContentGenerator\Domain\Context\DefaultContextDataProvider;
 
 class ContentGenerator {
     private ContextRepositoryInterface $contextRepository;
@@ -27,12 +26,21 @@ class ContentGenerator {
         $template = new Template($templateName, $templateContent);
         $this->templateRepository->addTemplate($template);
 
-        // Auto-register any missing contexts
+        $this->checkAndRegisterContexts($templateContent);
+    }
+
+    private function checkAndRegisterContexts(string $templateContent): void {
         $variables = TemplateParser::extractVariables($templateContent);
 
         foreach ($variables as $var) {
-            if ($this->contextRepository->getContext($var)->isDefault()) {
-                $this->registerContext($var, new DefaultContextDataProvider($var));
+            if (is_null($this->contextRepository->getContext($var))) {
+                $this->contextRepository->addMissingContext($var);
+                continue;
+            }
+            // Check nested templates
+            $nestedTemplate = $this->contextRepository->getContext($var)->render();
+            if (is_string($nestedTemplate)) {
+                $this->checkAndRegisterContexts($nestedTemplate);
             }
         }
     }

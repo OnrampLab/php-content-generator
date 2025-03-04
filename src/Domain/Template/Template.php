@@ -38,22 +38,6 @@ class Template {
                 $contextData[$key] = $rendered;
             }
 
-            $allVariables = TemplateParser::extractVariables($this->templateContent);
-
-            foreach ($allVariables as $variable) {
-                $keys = explode('.', $variable);
-                $current = &$contextData;
-                foreach ($keys as $key) {
-                    if (!isset($current[$key])) {
-                        $current[$key] = [];
-                    }
-                    $current = &$current[$key];
-                }
-                if (empty($current)) {
-                    $current = '{{ ' . $variable . ' }}';
-                }
-            }
-
             return $mustache->render($this->templateContent, $contextData);
         } catch (\Throwable $e) {
             throw new \RuntimeException("Render error in template '{$this->templateName}': " . $e->getMessage());

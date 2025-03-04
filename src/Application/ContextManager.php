@@ -4,7 +4,6 @@ namespace ContentGenerator\Application;
 
 use ContentGenerator\Domain\Context\Context;
 use ContentGenerator\Domain\Context\ContextRepositoryInterface;
-use ContentGenerator\Domain\Context\DefaultContextDataProvider;
 
 class ContextManager implements ContextRepositoryInterface {
     private array $contexts = [];
@@ -14,8 +13,8 @@ class ContextManager implements ContextRepositoryInterface {
         $this->contexts[$context->getName()] = $context;
     }
 
-    public function getContext(string $contextName): Context {
-        return $this->contexts[$contextName] ?? new Context($contextName, new DefaultContextDataProvider($contextName));
+    public function getContext(string $contextName): ?Context {
+        return $this->contexts[$contextName] ?? null;
     }
 
     public function getAllContexts(): array {
