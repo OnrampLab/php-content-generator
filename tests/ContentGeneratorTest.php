@@ -132,4 +132,31 @@ class ContentGeneratorTest extends TestCase
         $missingContexts = $this->contentGenerator->getMissingContexts();
         $this->assertContains('user.name', $missingContexts);
     }
+
+    public function testNestedComplexTemplateStructure()
+    {
+        $this->contentGenerator->registerContext('user', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): array
+            {
+                return ['name' => 'Alice', 'role' => 'admin'];
+            }
+        });
+        $this->contentGenerator->registerContext('content1', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string
+            {
+                return 'Hi {{user.name}}, welcome!';
+            }
+        });
+        $this->contentGenerator->registerContext('content2', new class implements ContextDataProvider {
+            public function getData(array $parameters = []): string
+            {
+                return '{{ user.role }}';
+            }
+        });
+
+        $this->contentGenerator->registerTemplate('complex', '{{ content1 }}, Role: {{ content2 }}');
+
+        $content = $this->contentGenerator->generateContent('complex');
+        $this->assertEquals('Hi Alice, welcome!, Role: admin', $content);
+    }
 }
