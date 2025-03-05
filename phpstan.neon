@@ -1,0 +1,10 @@
+parameters:
+    level: max
+    paths:
+        - src
+
+    # Optional: Include bootstrap file if necessary and ensure the path is correct
+    bootstrapFiles:
+        - vendor/autoload.php
+
+    # Optional: Add any other configuration options as needed
