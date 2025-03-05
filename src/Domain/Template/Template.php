@@ -4,6 +4,7 @@ namespace ContentGenerator\Domain\Template;
 
 use Mustache_Engine;
 use Mustache_Loader_StringLoader;
+use ContentGenerator\Domain\Context\Context;
 
 class Template
 {
@@ -26,6 +27,10 @@ class Template
         return $this->templateContent;
     }
 
+    /**
+     * @param array<string, Context> $contexts
+     * @param array<mixed> $parameters
+     */
     public function render(array $contexts, array $parameters = []): string
     {
         try {

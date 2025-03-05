@@ -7,6 +7,9 @@ use ContentGenerator\Domain\Template\TemplateRepositoryInterface;
 
 class TemplateManager implements TemplateRepositoryInterface
 {
+    /**
+     * @var array<string, Template> $templates
+     */
     private array $templates = [];
 
     public function addTemplate(Template $template): void
