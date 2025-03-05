@@ -1,0 +1,38 @@
+name: PHPStan
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: Install dependencies
+      run: composer install
+
+    - name: Get list of changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v34
+
+    - name: Run PHPStan
+      run: |
+        CHANGED_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | tr ' ' '\n' | grep '\.php$' || true)
+        if [ -n "$CHANGED_FILES" ]; then
+          vendor/bin/phpstan analyse $CHANGED_FILES
+        else
+          echo "No PHP files changed, skipping PHPStan."
+        fi
