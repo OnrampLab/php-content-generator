@@ -20,6 +20,9 @@ class Context
         return $this->contextName;
     }
 
+    /**
+     * @param array<mixed> $parameters
+     */
     public function render(array $parameters = []): mixed
     {
         if ($this->renderData !== null) {
@@ -29,7 +32,10 @@ class Context
         $this->renderData = $this->contextData->getData($parameters);
 
         if (is_array($this->renderData)) {
-            $this->renderData = array_map(fn($value) => is_string($value) ? $value : json_encode($value), $this->renderData);
+            $this->renderData = array_map(
+                fn($value) => is_string($value) ? $value : json_encode($value),
+                $this->renderData
+            );
         }
 
         return $this->renderData;

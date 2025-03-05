@@ -7,7 +7,14 @@ use ContentGenerator\Domain\Context\ContextRepositoryInterface;
 
 class ContextManager implements ContextRepositoryInterface
 {
+    /**
+     * @var array<string, Context> $contexts
+     */
     private array $contexts = [];
+
+    /**
+     * @var array<string> $missingContexts
+     */
     private array $missingContexts = [];
 
     public function addContext(Context $context): void
@@ -20,6 +27,9 @@ class ContextManager implements ContextRepositoryInterface
         return $this->contexts[$contextName] ?? null;
     }
 
+    /**
+     * @return array<string, Context>
+     */
     public function getAllContexts(): array
     {
         return $this->contexts;
@@ -30,6 +40,9 @@ class ContextManager implements ContextRepositoryInterface
         $this->missingContexts[] = $contextName;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getMissingContexts(): array
     {
         return $this->missingContexts;

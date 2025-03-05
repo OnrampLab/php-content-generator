@@ -14,8 +14,10 @@ class ContentGenerator
     private ContextRepositoryInterface $contextRepository;
     private TemplateRepositoryInterface $templateRepository;
 
-    public function __construct(ContextRepositoryInterface $contextRepository, TemplateRepositoryInterface $templateRepository)
-    {
+    public function __construct(
+        ContextRepositoryInterface $contextRepository,
+        TemplateRepositoryInterface $templateRepository
+    ) {
         $this->contextRepository = $contextRepository;
         $this->templateRepository = $templateRepository;
     }
@@ -34,6 +36,9 @@ class ContentGenerator
         $this->checkAndRegisterNestedContexts($templateContent);
     }
 
+    /**
+     * @param array<string> $visited
+     */
     public function checkAndRegisterNestedContexts(string $templateContent, array &$visited = []): void
     {
         $variables = TemplateParser::extractVariables($templateContent);
@@ -65,6 +70,9 @@ class ContentGenerator
         return preg_match('/{{.*}}/', $template) === 1;
     }
 
+    /**
+     * @param array<mixed> $parameters
+     */
     public function generateContent(string $templateName, array $parameters = []): string
     {
         $template = $this->templateRepository->getTemplate($templateName);
@@ -78,7 +86,9 @@ class ContentGenerator
         return $renderedContent;
     }
 
-
+    /**
+     * @return array<string>
+     */
     public function getMissingContexts(): array
     {
         return $this->contextRepository->getMissingContexts();

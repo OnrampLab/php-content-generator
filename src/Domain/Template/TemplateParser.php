@@ -7,6 +7,9 @@ use Mustache_Loader_StringLoader;
 
 class TemplateParser
 {
+    /**
+     * @return array<string>
+     */
     public static function extractVariables(string $templateContent): array
     {
         $mustache = new Mustache_Engine(['loader' => new Mustache_Loader_StringLoader()]);
