@@ -28,19 +28,26 @@ class ContentGenerator
         $this->contextRepository->removeMissingContext($contextName);
     }
 
-    public function registerTemplate(string $templateName, string $templateContent): void
+    /**
+     * @param array<mixed> $parameters
+     */
+    public function registerTemplate(string $templateName, string $templateContent, array $parameters = []): void
     {
         $template = new Template($templateName, $templateContent);
         $this->templateRepository->addTemplate($template);
 
-        $this->checkAndRegisterNestedContexts($templateContent);
+        $this->checkAndRegisterNestedContexts(templateContent: $templateContent, parameters: $parameters);
     }
 
     /**
      * @param array<string> $visited
+     * @param array<mixed> $parameters
      */
-    public function checkAndRegisterNestedContexts(string $templateContent, array &$visited = []): void
-    {
+    public function checkAndRegisterNestedContexts(
+        string $templateContent,
+        array &$visited = [],
+        array $parameters = []
+    ): void {
         $variables = TemplateParser::extractVariables($templateContent);
 
         foreach ($variables as $var) {
@@ -56,9 +63,9 @@ class ContentGenerator
             $visited[] = $var;
 
             // Check nested templates
-            $nestedTemplate = $this->contextRepository->getContext($var)->render();
+            $nestedTemplate = $this->contextRepository->getContext($var)->render($parameters);
             if (is_string($nestedTemplate) && $this->containsTemplateVariables($nestedTemplate)) {
-                $this->checkAndRegisterNestedContexts($nestedTemplate, $visited);
+                $this->checkAndRegisterNestedContexts($nestedTemplate, $visited, $parameters);
             }
 
             array_pop($visited); // Remove the current variable from the visited list after checking nested contexts
