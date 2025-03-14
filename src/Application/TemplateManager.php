@@ -3,9 +3,8 @@
 namespace ContentGenerator\Application;
 
 use ContentGenerator\Domain\Template\Template;
-use ContentGenerator\Domain\Template\TemplateRepositoryInterface;
 
-class TemplateManager implements TemplateRepositoryInterface
+class TemplateManager
 {
     /**
      * @var array<string, Template> $templates

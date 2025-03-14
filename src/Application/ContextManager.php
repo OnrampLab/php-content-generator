@@ -3,9 +3,8 @@
 namespace ContentGenerator\Application;
 
 use ContentGenerator\Domain\Context\Context;
-use ContentGenerator\Domain\Context\ContextRepositoryInterface;
 
-class ContextManager implements ContextRepositoryInterface
+class ContextManager
 {
     /**
      * @var array<string, Context> $contexts
