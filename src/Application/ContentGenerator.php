@@ -3,29 +3,27 @@
 namespace ContentGenerator\Application;
 
 use ContentGenerator\Domain\Context\ContextDataProvider;
-use ContentGenerator\Domain\Context\ContextRepositoryInterface;
-use ContentGenerator\Domain\Template\TemplateRepositoryInterface;
 use ContentGenerator\Domain\Template\TemplateParser;
 use ContentGenerator\Domain\Context\Context;
 use ContentGenerator\Domain\Template\Template;
 
 class ContentGenerator
 {
-    private ContextRepositoryInterface $contextRepository;
-    private TemplateRepositoryInterface $templateRepository;
+    private ContextManager $contextManager;
+    private TemplateManager $templateManager;
 
     public function __construct(
-        ContextRepositoryInterface $contextRepository,
-        TemplateRepositoryInterface $templateRepository
+        ContextManager $contextManager,
+        TemplateManager $templateManager
     ) {
-        $this->contextRepository = $contextRepository;
-        $this->templateRepository = $templateRepository;
+        $this->contextManager = $contextManager;
+        $this->templateManager = $templateManager;
     }
 
     public function registerContext(string $contextName, ContextDataProvider $provider): void
     {
-        $this->contextRepository->addContext(new Context($contextName, $provider));
-        $this->contextRepository->removeMissingContext($contextName);
+        $this->contextManager->addContext(new Context($contextName, $provider));
+        $this->contextManager->removeMissingContext($contextName);
     }
 
     /**
@@ -34,7 +32,7 @@ class ContentGenerator
     public function registerTemplate(string $templateName, string $templateContent, array $parameters = []): void
     {
         $template = new Template($templateName, $templateContent);
-        $this->templateRepository->addTemplate($template);
+        $this->templateManager->addTemplate($template);
 
         $this->checkAndRegisterNestedContexts(templateContent: $templateContent, parameters: $parameters);
     }
@@ -55,15 +53,15 @@ class ContentGenerator
                 throw new \RuntimeException("Detected recursive context: $var");
             }
 
-            if (is_null($this->contextRepository->getContext($var))) {
-                $this->contextRepository->addMissingContext($var);
+            if (is_null($this->contextManager->getContext($var))) {
+                $this->contextManager->addMissingContext($var);
                 continue;
             }
 
             $visited[] = $var;
 
             // Check nested templates
-            $nestedTemplate = $this->contextRepository->getContext($var)->render($parameters);
+            $nestedTemplate = $this->contextManager->getContext($var)->render($parameters);
             if (is_string($nestedTemplate) && $this->containsTemplateVariables($nestedTemplate)) {
                 $this->checkAndRegisterNestedContexts($nestedTemplate, $visited, $parameters);
             }
@@ -82,12 +80,12 @@ class ContentGenerator
      */
     public function generateContent(string $templateName, array $parameters = []): string
     {
-        $template = $this->templateRepository->getTemplate($templateName);
+        $template = $this->templateManager->getTemplate($templateName);
         if (!$template) {
             throw new \RuntimeException("Template '$templateName' not found.");
         }
 
-        $contexts = $this->contextRepository->getAllContexts();
+        $contexts = $this->contextManager->getAllContexts();
         $renderedContent = $template->render($contexts, $parameters);
 
         return $renderedContent;
@@ -98,11 +96,11 @@ class ContentGenerator
      */
     public function getMissingContexts(): array
     {
-        return $this->contextRepository->getMissingContexts();
+        return $this->contextManager->getMissingContexts();
     }
 
     public function removeContext(string $contextName): void
     {
-        $this->contextRepository->removeContext($contextName);
+        $this->contextManager->removeContext($contextName);
     }
 }
