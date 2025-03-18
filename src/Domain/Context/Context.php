@@ -30,14 +30,6 @@ class Context
         }
 
         $this->renderData = $this->contextData->getData($parameters);
-
-        if (is_array($this->renderData)) {
-            $this->renderData = array_map(
-                fn($value) => is_string($value) ? $value : json_encode($value),
-                $this->renderData
-            );
-        }
-
         return $this->renderData;
     }
 }
